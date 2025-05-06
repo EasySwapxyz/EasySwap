@@ -1,0 +1,298 @@
+# EasySwap - Peer-to-Peer Trading Platform
+
+<div align="center">
+  <img src="assets/images/logo.png" alt="EasySwap Logo" width="250">
+  
+  [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/licenses/MIT)
+  [![Website](https://img.shields.io/badge/Website-easyswap.shop-blue)](https://www.easyswap.shop)
+  [![Twitter](https://img.shields.io/badge/Twitter-@EasySwap__xyz-blue)](https://x.com/EasySwap_xyz)
+  [![GitHub](https://img.shields.io/badge/GitHub-EasySwapxyz-blue)](https://github.com/EasySwapxyz/EasySwap)
+</div>
+
+## Overview
+
+EasySwap revolutionizes peer-to-peer trading of second-hand items through an AI-powered, secure, and user-friendly platform. Our solution combines advanced technology with intuitive design to create a seamless trading experience.
+
+## System Architecture
+
+### Component Architecture
+```mermaid
+graph TD
+    A[Client Layer] --> B[API Gateway]
+    B --> C[Service Layer]
+    C --> D[Data Layer]
+    
+    subgraph "Client Layer"
+        A1[Mobile App] --> A
+        A2[Web App] --> A
+        A3[Admin Portal] --> A
+    end
+    
+    subgraph "Service Layer"
+        C1[User Service] --> C
+        C2[Product Service] --> C
+        C3[Transaction Service] --> C
+        C4[Chat Service] --> C
+        C5[Search Service] --> C
+        C6[AI Service] --> C
+    end
+    
+    subgraph "Data Layer"
+        D1[PostgreSQL] --> D
+        D2[Redis Cache] --> D
+        D3[MinIO Storage] --> D
+        D4[Elasticsearch] --> D
+    end
+```
+
+### Data Flow Architecture
+```mermaid
+sequenceDiagram
+    participant U as User
+    participant C as Client App
+    participant G as API Gateway
+    participant S as Services
+    participant D as Database
+    participant E as External Services
+
+    U->>C: Interact with UI
+    C->>G: API Request
+    G->>G: Auth & Rate Limiting
+    G->>S: Route Request
+    S->>D: Data Operation
+    S->>E: External Service Call
+    E->>S: Service Response
+    S->>G: Service Response
+    G->>C: API Response
+    C->>U: UI Update
+```
+
+## Technical Implementation
+
+### Frontend Architecture
+```mermaid
+graph LR
+    A[Components] --> B[Store]
+    B --> C[Services]
+    C --> D[API Client]
+    
+    subgraph "State Management"
+        B1[Actions] --> B
+        B2[Reducers] --> B
+        B3[Selectors] --> B
+    end
+    
+    subgraph "Service Layer"
+        C1[Auth Service] --> C
+        C2[Product Service] --> C
+        C3[User Service] --> C
+    end
+```
+
+### Backend Architecture
+```mermaid
+graph TD
+    A[Controllers] --> B[Services]
+    B --> C[Repositories]
+    C --> D[Database]
+    
+    subgraph "Middleware"
+        M1[Auth] --> A
+        M2[Validation] --> A
+        M3[Error Handling] --> A
+    end
+    
+    subgraph "External Services"
+        E1[Payment Gateway] --> B
+        E2[AI Services] --> B
+        E3[Storage Service] --> B
+    end
+```
+
+## Directory Structure
+
+```
+easyswap/
+├── apps/                         # Client applications
+│   ├── mobile/                   # React Native mobile app
+│   ├── web/                      # Next.js web app
+│   └── admin/                    # React admin portal
+├── backend/                      # NestJS backend
+│   ├── src/
+│   │   ├── controllers/         # API endpoints
+│   │   ├── services/            # Business logic
+│   │   ├── models/              # Data models
+│   │   ├── middleware/          # Custom middleware
+│   │   └── utils/               # Utility functions
+│   └── tests/                   # Backend tests
+├── shared/                      # Shared code
+│   ├── constants/              # Shared constants
+│   ├── interfaces/             # TypeScript interfaces
+│   └── utils/                  # Shared utilities
+├── contracts/                   # Smart contracts
+│   ├── src/                    # Contract source
+│   └── tests/                  # Contract tests
+└── docs/                       # Documentation
+    ├── api/                    # API documentation
+    ├── contracts/              # Contract documentation
+    └── en/                     # English documentation
+```
+
+## Core Features Implementation
+
+### Smart Item Listing
+```typescript
+// Product Service Implementation
+class ProductService {
+  async createListing(data: CreateListingDTO): Promise<Listing> {
+    // AI-powered category suggestion
+    const category = await this.aiService.suggestCategory(data.images);
+    
+    // Price recommendation
+    const recommendedPrice = await this.aiService.recommendPrice({
+      category,
+      condition: data.condition,
+      brand: data.brand,
+      model: data.model
+    });
+    
+    // Create listing with enhanced data
+    return this.listingRepository.create({
+      ...data,
+      suggestedCategory: category,
+      recommendedPrice
+    });
+  }
+}
+```
+
+### Secure Trading System
+```typescript
+// Transaction Service Implementation
+class TransactionService {
+  async createTransaction(data: CreateTransactionDTO): Promise<Transaction> {
+    // Start escrow process
+    const escrow = await this.escrowService.create({
+      buyer: data.buyerId,
+      seller: data.sellerId,
+      amount: data.amount
+    });
+    
+    // Create transaction record
+    const transaction = await this.transactionRepository.create({
+      ...data,
+      escrowId: escrow.id,
+      status: TransactionStatus.PENDING
+    });
+    
+    // Notify participants
+    await this.notificationService.notifyParticipants(transaction);
+    
+    return transaction;
+  }
+}
+```
+
+### Location-Based Services
+```typescript
+// Search Service Implementation
+class SearchService {
+  async searchNearby(params: SearchParams): Promise<SearchResult> {
+    const { latitude, longitude, radius, category } = params;
+    
+    // Geospatial search query
+    const items = await this.itemRepository.findNearby({
+      location: {
+        type: 'Point',
+        coordinates: [longitude, latitude]
+      },
+      radius,
+      category
+    });
+    
+    // Enhance results with distance and ETA
+    return items.map(item => ({
+      ...item,
+      distance: this.calculateDistance(latitude, longitude, item),
+      estimatedTime: this.calculateETA(latitude, longitude, item)
+    }));
+  }
+}
+```
+
+## Security Implementation
+
+### Authentication Flow
+```mermaid
+sequenceDiagram
+    participant U as User
+    participant C as Client
+    participant A as Auth Service
+    participant D as Database
+    
+    U->>C: Login Request
+    C->>A: Authenticate
+    A->>D: Verify Credentials
+    D->>A: User Data
+    A->>A: Generate JWT
+    A->>C: Auth Tokens
+    C->>U: Login Success
+```
+
+### Transaction Security
+```mermaid
+sequenceDiagram
+    participant B as Buyer
+    participant E as Escrow Service
+    participant S as Seller
+    
+    B->>E: Initiate Purchase
+    E->>E: Lock Funds
+    E->>S: Notify Seller
+    S->>E: Confirm Shipment
+    B->>E: Confirm Receipt
+    E->>S: Release Funds
+```
+
+## Getting Started
+
+### Prerequisites
+- Node.js (v18+)
+- Docker
+- PostgreSQL (v15+)
+- Redis (v7+)
+
+### Installation
+```bash
+# Clone the repository
+git clone https://github.com/EasySwapxyz/EasySwap.git
+cd EasySwap
+
+# Install dependencies
+npm install
+
+# Set up environment
+cp .env.example .env
+
+# Start services
+docker-compose up -d
+
+# Start development
+npm run dev
+```
+
+## Contributing
+
+Please read our [Contributing Guidelines](CONTRIBUTING.md) for details on our code of conduct and the process for submitting pull requests.
+
+## License
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
+## Contact
+
+- Website: [easyswap.shop](https://www.easyswap.shop)
+- Email: contact@easyswap.shop
+- Twitter: [@EasySwap_xyz](https://x.com/EasySwap_xyz)
+
+Built with ❤️ by the EasySwap Team 

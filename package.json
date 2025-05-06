@@ -1,0 +1,55 @@
+{
+  "name": "easyswap",
+  "version": "1.0.0",
+  "description": "EasySwap - Peer-to-Peer Trading Platform",
+  "private": true,
+  "workspaces": [
+    "apps/*",
+    "backend",
+    "shared/*"
+  ],
+  "scripts": {
+    "dev": "npm-run-all --parallel dev:*",
+    "dev:web": "cd apps/web && npm run dev",
+    "dev:mobile": "cd apps/mobile && npm run start",
+    "dev:admin": "cd apps/admin && npm run dev",
+    "dev:api": "cd backend && npm run start:dev",
+    "build": "npm-run-all --parallel build:*",
+    "build:web": "cd apps/web && npm run build",
+    "build:mobile": "cd apps/mobile && npm run build",
+    "build:admin": "cd apps/admin && npm run build",
+    "build:api": "cd backend && npm run build",
+    "test": "npm-run-all --parallel test:*",
+    "test:web": "cd apps/web && npm run test",
+    "test:mobile": "cd apps/mobile && npm run test",
+    "test:admin": "cd apps/admin && npm run test",
+    "test:api": "cd backend && npm run test",
+    "lint": "npm-run-all --parallel lint:*",
+    "lint:web": "cd apps/web && npm run lint",
+    "lint:mobile": "cd apps/mobile && npm run lint",
+    "lint:admin": "cd apps/admin && npm run lint",
+    "lint:api": "cd backend && npm run lint",
+    "prepare": "husky install"
+  },
+  "devDependencies": {
+    "@commitlint/cli": "^17.0.0",
+    "@commitlint/config-conventional": "^17.0.0",
+    "husky": "^8.0.0",
+    "lint-staged": "^13.0.0",
+    "npm-run-all": "^4.1.5",
+    "prettier": "^2.8.0"
+  },
+  "engines": {
+    "node": ">=18.0.0",
+    "npm": ">=8.0.0"
+  },
+  "lint-staged": {
+    "*.{js,jsx,ts,tsx}": [
+      "prettier --write",
+      "eslint --fix"
+    ],
+    "*.{json,md}": [
+      "prettier --write"
+    ]
+  }
+} 
